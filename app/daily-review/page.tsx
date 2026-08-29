@@ -1,0 +1,9 @@
+"use client";
+
+import { useEffect, useState } from "react";
+import { ArrowLeft, CheckCircle2 } from "lucide-react";
+import "./daily-review.css";
+
+type Review = { wins: string; learned: string; confused: string; tomorrow: string; completedAt?: string };
+const blank: Review = { wins: "", learned: "", confused: "", tomorrow: "" };
+export default function DailyReviewPage() { const [review, setReview] = useState<Review>(blank); const [ready, setReady] = useState(false); useEffect(() => { try { const saved = localStorage.getItem("pos.daily-review"); if (saved) setReview(JSON.parse(saved)); } finally { setReady(true); } }, []); useEffect(() => { if (ready) localStorage.setItem("pos.daily-review", JSON.stringify(review)); }, [review, ready]); const update = (key: keyof Review, value: string) => setReview(item => ({ ...item, [key]: value })); return <main className="daily"><a href="/" className="back"><ArrowLeft size={16}/> Personal OS</a><p>REFLECT</p><h1>Daily review</h1><span>Turn today&apos;s work into a clearer tomorrow.</span><section>{([ ["wins", "What did you accomplish?", "Finished, progressed, or showed up for..."], ["learned", "What did you learn?", "A concept, insight, or useful observation..."], ["confused", "What confused you?", "Name the question so you can return to it."], ["tomorrow", "What should you continue tomorrow?", "One clear next action is enough."] ] as const).map(([key, label, placeholder]) => <label key={key}>{label}<textarea value={review[key]} onChange={event => update(key, event.target.value)} placeholder={placeholder}/></label>)}</section><div className="summary"><span>Saved automatically in this browser</span><button onClick={() => setReview(item => ({ ...item, completedAt: new Date().toLocaleDateString() }))}><CheckCircle2 size={16}/> Finish day</button>{review.completedAt && <small>Finished {review.completedAt}</small>}</div></main>; }
