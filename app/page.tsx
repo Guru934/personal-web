@@ -1,13 +1,13 @@
 "use client";
 import { useEffect, useMemo, useState, type ReactNode } from "react";
-import { BookOpen, Check, Clock3, ExternalLink, FileText, Film, Flame, Home, LayoutGrid, ListTodo, Menu, Play, Plus, Search, Settings, Sparkles, Target, TimerReset, Trash2 } from "lucide-react";
+import { BookOpen, Check, Clock3, ExternalLink, FileText, Film, Flame, Home as HomeIcon, LayoutGrid, ListTodo, Menu, Play, Plus, Search, Settings, Sparkles, Target, TimerReset, Trash2 } from "lucide-react";
 
 type Task={id:number;text:string;done:boolean};
 type Topic={id:number;name:string;subject:string;progress:number};
 type Note={id:number;title:string;content:string;subject:string;updated:string};
 type Resource={id:number;title:string;url:string;subject:string;progress:number};
 const nav=["Dashboard","Study","Notes","Tasks","Timetable","Goals","Habits","Resources","Media"];
-const icons:any={Dashboard:Home,Study:BookOpen,Notes:FileText,Tasks:ListTodo,Timetable:LayoutGrid,Goals:Target,Habits:Flame,Resources:BookOpen,Media:Film};
+const icons:any={Dashboard:HomeIcon,Study:BookOpen,Notes:FileText,Tasks:ListTodo,Timetable:LayoutGrid,Goals:Target,Habits:Flame,Resources:BookOpen,Media:Film};
 const starterTasks:Task[]=[{id:1,text:"Complete JavaScript Functions",done:false},{id:2,text:"Revise Physics formulas",done:false},{id:3,text:"Complete a freeCodeCamp lesson",done:true}];
 const starterTopics:Topic[]=[{id:1,name:"Functions",subject:"JavaScript",progress:82},{id:2,name:"Arrays",subject:"JavaScript",progress:64},{id:3,name:"DOM",subject:"JavaScript",progress:25},{id:4,name:"Mechanics",subject:"Physics",progress:78},{id:5,name:"Thermodynamics",subject:"Physics",progress:48}];
 const starterNotes:Note[]=[{id:1,title:"JavaScript Functions",content:"Review declarations, expressions, arrow functions and parameters.",subject:"JavaScript",updated:"Today"}];
