@@ -1,95 +1,44 @@
 "use client";
+import { useEffect, useMemo, useState } from "react";
+import { BookOpen, Check, Clock3, ExternalLink, FileText, Film, Flame, Home, LayoutGrid, ListTodo, Menu, Play, Plus, Search, Settings, Sparkles, Target, TimerReset, Trash2 } from "lucide-react";
 
-import { useEffect, useState } from "react";
-import { BookOpen, Check, Clock3, FileText, Film, Flame, Goal, Home, LayoutGrid, ListTodo, Menu, Play, Plus, Search, Settings, Sparkles, Target, TimerReset, X } from "lucide-react";
-
-const nav = [
-  { label: "Dashboard", icon: Home },
-  { label: "Study", icon: BookOpen },
-  { label: "Notes", icon: FileText },
-  { label: "Tasks", icon: ListTodo },
-  { label: "Timetable", icon: LayoutGrid },
-  { label: "Goals", icon: Target },
-  { label: "Habits", icon: Flame },
-  { label: "Resources", icon: BookOpen },
-  { label: "Media", icon: Film },
-];
-
-const initialTasks = [
-  { id: 1, text: "Complete JavaScript Functions", done: false },
-  { id: 2, text: "Revise Physics formulas", done: false },
-  { id: 3, text: "Complete a freeCodeCamp lesson", done: true },
-];
-
-export default function HomePage() {
-  const [tasks, setTasks] = useState(initialTasks);
-  const [scratch, setScratch] = useState("");
-  const [seconds, setSeconds] = useState(25 * 60);
-  const [running, setRunning] = useState(false);
-  const [active, setActive] = useState("Dashboard");
-  const [sidebar, setSidebar] = useState(true);
-
-  useEffect(() => {
-    const saved = localStorage.getItem("personal-os");
-    if (saved) {
-      const data = JSON.parse(saved);
-      if (data.tasks) setTasks(data.tasks);
-      if (typeof data.scratch === "string") setScratch(data.scratch);
-    }
-  }, []);
-
-  useEffect(() => {
-    localStorage.setItem("personal-os", JSON.stringify({ tasks, scratch }));
-  }, [tasks, scratch]);
-
-  useEffect(() => {
-    if (!running) return;
-    const timer = setInterval(() => setSeconds((s) => s > 0 ? s - 1 : 0), 1000);
-    return () => clearInterval(timer);
-  }, [running]);
-
-  const toggleTask = (id: number) => setTasks(tasks.map(t => t.id === id ? { ...t, done: !t.done } : t));
-  const mins = String(Math.floor(seconds / 60)).padStart(2, "0");
-  const secs = String(seconds % 60).padStart(2, "0");
-  const completed = tasks.filter(t => t.done).length;
-
-  return (
-    <main className="app-shell">
-      <aside className={`sidebar ${sidebar ? "open" : "closed"}`}>
-        <div className="brand"><div className="brand-mark">P</div>{sidebar && <div><strong>Personal OS</strong><span>your learning system</span></div>}</div>
-        <nav>{nav.map(({ label, icon: Icon }) => <button key={label} className={active === label ? "nav-item active" : "nav-item"} onClick={() => setActive(label)}><Icon size={18}/>{sidebar && label}</button>)}</nav>
-        <div className="sidebar-bottom"><button className="nav-item"><Settings size={18}/>{sidebar && "Settings"}</button></div>
-      </aside>
-
-      <section className="content">
-        <header className="topbar">
-          <button className="icon-btn" onClick={() => setSidebar(!sidebar)}><Menu size={20}/></button>
-          <div className="search"><Search size={17}/><span>Search everything...</span><kbd>⌘ K</kbd></div>
-          <button className="ai-btn"><Sparkles size={16}/> AI</button>
-        </header>
-
-        <div className="page">
-          <div className="welcome"><div><p className="eyebrow">SATURDAY · AUGUST 29, 2026</p><h1>Good morning, Guru.</h1><p className="muted">Build momentum. One focused block at a time.</p></div><div className="status-pill"><span/> System ready</div></div>
-
-          <div className="grid top-grid">
-            <section className="card priority-card"><div className="card-head"><div><p className="eyebrow">TODAY'S TOP 3</p><h2>What matters today</h2></div><span className="count">{completed}/{tasks.length}</span></div>{tasks.map(task => <button className="task-row" key={task.id} onClick={() => toggleTask(task.id)}><span className={`checkbox ${task.done ? "checked" : ""}`}>{task.done && <Check size={13}/>}</span><span className={task.done ? "done" : ""}>{task.text}</span></button>)}</section>
-
-            <section className="card focus-card"><div className="card-head"><div><p className="eyebrow">CURRENT FOCUS</p><h2>JavaScript — Functions</h2></div><Clock3 size={20}/></div><div className="timer">{mins}:{secs}</div><div className="timer-label">{running ? "FOCUSING" : "READY TO FOCUS"}</div><div className="timer-actions"><button className="primary" onClick={() => setRunning(!running)}><Play size={16} fill="currentColor"/>{running ? "Pause" : "Start Focus"}</button><button className="secondary" onClick={() => {setRunning(false);setSeconds(25*60)}}><TimerReset size={16}/></button></div></section>
-          </div>
-
-          <div className="grid middle-grid">
-            <section className="card"><div className="card-head"><div><p className="eyebrow">CONTINUE LEARNING</p><h2>freeCodeCamp</h2></div><BookOpen size={20}/></div><div className="resource"><div className="resource-icon">JS</div><div className="resource-main"><strong>JavaScript Algorithms</strong><span>Last session · Yesterday</span><div className="progress"><i style={{width:"42%"}}/></div><small>42% complete</small></div><a className="primary small" href="https://www.freecodecamp.org/learn/" target="_blank">Continue</a></div></section>
-            <section className="card"><div className="card-head"><div><p className="eyebrow">TODAY</p><h2>Momentum</h2></div><Flame size={20}/></div><div className="stats"><div><strong>2h 15m</strong><span>Focus</span></div><div><strong>3h 05m</strong><span>Study</span></div><div><strong>{completed}/{tasks.length}</strong><span>Tasks</span></div></div></section>
-          </div>
-
-          <div className="grid bottom-grid">
-            <section className="card scratch-card"><div className="card-head"><div><p className="eyebrow">QUICK CAPTURE</p><h2>Daily dump</h2></div><Plus size={20}/></div><textarea value={scratch} onChange={e => setScratch(e.target.value)} placeholder="Formula, thought, reminder... capture it before it disappears."/><div className="scratch-foot"><span>Saved automatically</span><span>{scratch.length} characters</span></div></section>
-            <section className="card"><div className="card-head"><div><p className="eyebrow">UP NEXT</p><h2>Today's timetable</h2></div><LayoutGrid size={20}/></div><div className="schedule"><div><b>10:30</b><span>freeCodeCamp · JavaScript</span></div><div><b>14:00</b><span>Physics · Revision</span></div><div><b>17:00</b><span>Exercise</span></div><div><b>19:00</b><span>Review & recall</span></div></div></section>
-          </div>
-
-          <footer><span>Personal OS · V1</span><span>Local-first · Your data stays in your browser</span></footer>
-        </div>
-      </section>
-    </main>
-  );
+type Task={id:number;text:string;done:boolean};
+type Topic={id:number;name:string;subject:string;progress:number};
+type Note={id:number;title:string;content:string;subject:string;updated:string};
+type Resource={id:number;title:string;url:string;subject:string;progress:number};
+const nav=["Dashboard","Study","Notes","Tasks","Timetable","Goals","Habits","Resources","Media"];
+const icons:any={Dashboard:Home,Study:BookOpen,Notes:FileText,Tasks:ListTodo,Timetable:LayoutGrid,Goals:Target,Habits:Flame,Resources:BookOpen,Media:Film};
+const starterTasks:Task[]=[{id:1,text:"Complete JavaScript Functions",done:false},{id:2,text:"Revise Physics formulas",done:false},{id:3,text:"Complete a freeCodeCamp lesson",done:true}];
+const starterTopics:Topic[]=[{id:1,name:"Functions",subject:"JavaScript",progress:82},{id:2,name:"Arrays",subject:"JavaScript",progress:64},{id:3,name:"DOM",subject:"JavaScript",progress:25},{id:4,name:"Mechanics",subject:"Physics",progress:78},{id:5,name:"Thermodynamics",subject:"Physics",progress:48}];
+const starterNotes:Note[]=[{id:1,title:"JavaScript Functions",content:"Review declarations, expressions, arrow functions and parameters.",subject:"JavaScript",updated:"Today"}];
+const starterResources:Resource[]=[{id:1,title:"JavaScript Algorithms",url:"https://www.freecodecamp.org/learn/javascript-algorithms-and-data-structures-v8/",subject:"JavaScript",progress:42}];
+function store<T>(key:string,initial:T){const [v,setV]=useState(initial);useEffect(()=>{try{const x=localStorage.getItem(key);if(x)setV(JSON.parse(x))}catch{}},[key]);useEffect(()=>{localStorage.setItem(key,JSON.stringify(v))},[key,v]);return [v,setV] as const}
+export default function Home(){
+ const [active,setActive]=useState("Dashboard"),[side,setSide]=useState(true),[query,setQuery]=useState("");
+ const [tasks,setTasks]=store<Task[]>("pos.tasks",starterTasks),[topics]=store<Topic[]>("pos.topics",starterTopics),[notes,setNotes]=store<Note[]>("pos.notes",starterNotes),[resources,setResources]=store<Resource[]>("pos.resources",starterResources),[scratch,setScratch]=store("pos.scratch","");
+ const [seconds,setSeconds]=useState(1500),[running,setRunning]=useState(false),[newTask,setNewTask]=useState(""),[newNote,setNewNote]=useState("");
+ useEffect(()=>{if(!running)return;const t=setInterval(()=>setSeconds(s=>s>0?s-1:0),1000);return()=>clearInterval(t)},[running]);
+ const done=tasks.filter(t=>t.done).length,mm=String(Math.floor(seconds/60)).padStart(2,"0"),ss=String(seconds%60).padStart(2,"0");
+ const filtered=useMemo(()=>notes.filter(n=>(n.title+n.content+n.subject).toLowerCase().includes(query.toLowerCase())),[notes,query]);
+ const addTask=()=>{if(newTask.trim()){setTasks([...tasks,{id:Date.now(),text:newTask.trim(),done:false}]);setNewTask("")}};
+ const addNote=()=>{if(newNote.trim()){setNotes([{id:Date.now(),title:newNote.trim(),content:"",subject:"General",updated:"Just now"},...notes]);setNewNote("")}};
+ const addResource=()=>{const title=prompt("Resource name");const url=prompt("Resource URL");if(title&&url)setResources([...resources,{id:Date.now(),title,url,subject:"General",progress:0}])};
+ return <main className="app-shell"><aside className={`sidebar ${side?"open":"closed"}`}><div className="brand"><div className="brand-mark">P</div>{side&&<div><strong>Personal OS</strong><span>your learning system</span></div>}</div><nav>{nav.map(n=>{const I=icons[n];return <button key={n} className={`nav-item ${active===n?"active":""}`} onClick={()=>setActive(n)}><I size={18}/>{side&&n}</button>})}</nav><div className="sidebar-bottom"><button className="nav-item"><Settings size={18}/>{side&&"Settings"}</button></div></aside>
+ <section className="content"><header className="topbar"><button className="icon-btn" onClick={()=>setSide(!side)}><Menu size={20}/></button><div className="search"><Search size={17}/><input value={query} onChange={e=>setQuery(e.target.value)} placeholder="Search everything..."/><kbd>⌘ K</kbd></div><button className="ai-btn"><Sparkles size={16}/> AI</button></header><div className="page">
+ {active==="Dashboard"&&<Dashboard tasks={tasks} done={done} toggle={id=>setTasks(tasks.map(t=>t.id===id?{...t,done:!t.done}:t))} scratch={scratch} setScratch={setScratch} mm={mm} ss={ss} running={running} setRunning={setRunning} reset={()=>{setRunning(false);setSeconds(1500)}} resources={resources}/>} 
+ {active==="Study"&&<Study topics={topics}/>} 
+ {active==="Notes"&&<Notes notes={filtered} value={newNote} setValue={setNewNote} add={addNote} remove={id=>setNotes(notes.filter(n=>n.id!==id))} query={query}/>} 
+ {active==="Tasks"&&<TaskPage tasks={tasks} value={newTask} setValue={setNewTask} add={addTask} toggle={id=>setTasks(tasks.map(t=>t.id===id?{...t,done:!t.done}:t))} remove={id=>setTasks(tasks.filter(t=>t.id!==id))}/>} 
+ {active==="Resources"&&<Resources resources={resources} add={addResource}/>} 
+ {active==="Timetable"&&<Simple title="Timetable" eyebrow="PLAN" text="Your weekly study blocks, ready to connect to subjects and resources." rows={["10:30  ·  freeCodeCamp — JavaScript","14:00  ·  Physics — Revision","17:00  ·  Exercise","19:00  ·  Review & recall"]}/>} 
+ {active==="Goals"&&<Simple title="Goals" eyebrow="PLAN" text="Long-term outcomes broken into measurable milestones." rows={["Web Development  ·  34%","JavaScript  ·  82%","Portfolio projects  ·  1 / 3"]}/>} 
+ {active==="Habits"&&<Simple title="Habits" eyebrow="LIFE" text="Track consistency without entering data the system already knows." rows={["Study 2 hours  ·  ✓ ✓ ✓ ✓ ✓ ✓ ○","Code daily  ·  ✓ ✓ ✓ ✓ ✓ ✓ ✓","Review cards  ·  ✓ ✓ ✓ ✓ ✓ ○ ○"]}/>} 
+ {active==="Media"&&<Simple title="Media" eyebrow="MEDIA" text="A lightweight library for movies, anime, manga and music links." rows={["Movies  ·  0 items","Anime  ·  0 items","Manga  ·  0 items","Music  ·  0 items"]}/>}<footer><span>Personal OS · V1.1</span><span>Local-first · Your data stays in your browser</span></footer></div></section></main>
 }
+function Head({eyebrow,title,text,action}:{eyebrow:string;title:string;text:string;action?:React.ReactNode}){return <div className="section-title"><div><p className="eyebrow">{eyebrow}</p><h1>{title}</h1><p className="muted">{text}</p></div>{action}</div>}
+function Dashboard(p:any){return <><div className="welcome"><div><p className="eyebrow">SATURDAY · AUGUST 29, 2026</p><h1>Good morning, Guru.</h1><p className="muted">Build momentum. One focused block at a time.</p></div><div className="status-pill"><span/> System ready</div></div><div className="grid top-grid"><section className="card"><div className="card-head"><div><p className="eyebrow">TODAY'S TOP 3</p><h2>What matters today</h2></div><span className="count">{p.done}/{p.tasks.length}</span></div>{p.tasks.slice(0,3).map((t:Task)=><button className="task-row" key={t.id} onClick={()=>p.toggle(t.id)}><span className={`checkbox ${t.done?"checked":""}`}>{t.done&&<Check size={13}/>}</span><span className={t.done?"done":""}>{t.text}</span></button>)}</section><section className="card focus-card"><div className="card-head"><div><p className="eyebrow">CURRENT FOCUS</p><h2>JavaScript — Functions</h2></div><Clock3 size={20}/></div><div className="timer">{p.mm}:{p.ss}</div><div className="timer-label">{p.running?"FOCUSING":"READY TO FOCUS"}</div><div className="timer-actions"><button className="primary" onClick={()=>p.setRunning(!p.running)}><Play size={16} fill="currentColor"/>{p.running?"Pause":"Start Focus"}</button><button className="secondary" onClick={p.reset}><TimerReset size={16}/></button></div></section></div><div className="grid middle-grid"><section className="card"><div className="card-head"><div><p className="eyebrow">CONTINUE LEARNING</p><h2>freeCodeCamp</h2></div><BookOpen size={20}/></div><div className="resource"><div className="resource-icon">JS</div><div className="resource-main"><strong>{p.resources[0]?.title}</strong><span>Learning resource</span><div className="progress"><i style={{width:`${p.resources[0]?.progress||0}%`}}/></div><small>{p.resources[0]?.progress||0}% complete</small></div><a className="primary small" href={p.resources[0]?.url} target="_blank">Continue</a></div></section><section className="card"><div className="card-head"><div><p className="eyebrow">TODAY</p><h2>Momentum</h2></div><Flame size={20}/></div><div className="stats"><div><strong>2h 15m</strong><span>Focus</span></div><div><strong>3h 05m</strong><span>Study</span></div><div><strong>{p.done}/{p.tasks.length}</strong><span>Tasks</span></div></div></section></div><div className="grid bottom-grid"><section className="card scratch-card"><div className="card-head"><div><p className="eyebrow">QUICK CAPTURE</p><h2>Daily dump</h2></div><Plus size={20}/></div><textarea value={p.scratch} onChange={e=>p.setScratch(e.target.value)} placeholder="Formula, thought, reminder... capture it before it disappears."/><div className="scratch-foot"><span>Saved automatically</span><span>{p.scratch.length} characters</span></div></section><section className="card"><div className="card-head"><div><p className="eyebrow">UP NEXT</p><h2>Today's timetable</h2></div><LayoutGrid size={20}/></div><div className="schedule"><div><b>10:30</b><span>freeCodeCamp · JavaScript</span></div><div><b>14:00</b><span>Physics · Revision</span></div><div><b>17:00</b><span>Exercise</span></div><div><b>19:00</b><span>Review & recall</span></div></div></section></div></>}
+function Study({topics}:{topics:Topic[]}){return <><Head eyebrow="LEARN" title="Study" text="Subjects and topics are the backbone of your learning system."/><div className="notes-grid">{[...new Set(topics.map(t=>t.subject))].map(s=><section className="card list-card" key={s}><div className="card-head"><div><p className="eyebrow">SUBJECT</p><h2>{s}</h2></div><span className="count">{topics.filter(t=>t.subject===s).length} topics</span></div>{topics.filter(t=>t.subject===s).map(t=><div className="topic-row" key={t.id}><div><strong>{t.name}</strong><span>{t.progress}% complete</span></div><div className="topic-progress"><i style={{width:`${t.progress}%`}}/></div></div>)}</section>)}</div></>}
+function Notes(p:any){return <><Head eyebrow="KNOWLEDGE" title="Notes" text="Capture knowledge and keep it connected."/><section className="card composer"><input value={p.value} onChange={e=>p.setValue(e.target.value)} onKeyDown={e=>e.key==="Enter"&&p.add()} placeholder="New note title..."/><button className="primary" onClick={p.add}><Plus size={16}/> Add note</button></section>{p.query&&<p className="muted search-result">Showing notes matching “{p.query}”</p>}<div className="notes-grid">{p.notes.map((n:Note)=><article className="card note-card" key={n.id}><div className="note-meta"><span>{n.subject}</span><span>{n.updated}</span></div><h2>{n.title}</h2><p>{n.content||"Empty note — add content when ready."}</p><button className="secondary" onClick={()=>p.remove(n.id)}><Trash2 size={14}/> Delete</button></article>)}</div></>}
+function TaskPage(p:any){return <><Head eyebrow="PLAN" title="Tasks" text="Keep the list actionable. The dashboard surfaces your Top 3."/><section className="card composer"><input value={p.value} onChange={e=>p.setValue(e.target.value)} onKeyDown={e=>e.key==="Enter"&&p.add()} placeholder="Add a task..."/><button className="primary" onClick={p.add}><Plus size={16}/> Add task</button></section><section className="card list-card">{p.tasks.map((t:Task)=><div className="task-row full" key={t.id}><button className="task-toggle" onClick={()=>p.toggle(t.id)}><span className={`checkbox ${t.done?"checked":""}`}>{t.done&&<Check size={13}/>}</span><span className={t.done?"done":""}>{t.text}</span></button><button className="icon-btn" onClick={()=>p.remove(t.id)}><Trash2 size={16}/></button></div>)}</section></>}
+function Resources(p:any){return <><Head eyebrow="LEARN" title="Resources" text="Keep freeCodeCamp and your other learning links close." action={<button className="primary" onClick={p.add}><Plus size={16}/> Add resource</button>}/><div className="notes-grid">{p.resources.map((r:Resource)=><article className="card note-card" key={r.id}><div className="note-meta"><span>{r.subject}</span><span>{r.progress}%</span></div><h2>{r.title}</h2><div className="progress"><i style={{width:`${r.progress}%`}}/></div><p>Learning progress</p><a className="secondary" href={r.url} target="_blank"><ExternalLink size={14}/> Open resource</a></article>)}</div></>}
+function Simple({title,eyebrow,text,rows}:{title:string;eyebrow:string;text:string;rows:string[]}){return <><Head eyebrow={eyebrow} title={title} text={text}/><section className="card list-card">{rows.map((r,i)=><div className="simple-row" key={i}>{r}</div>)}</section></>}
