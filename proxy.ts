@@ -8,8 +8,10 @@ export async function proxy(request: NextRequest) {
   if (!url || !key) return response;
   const supabase = createServerClient(url, key, { cookies: { getAll: () => request.cookies.getAll(), setAll: values => { values.forEach(({ name, value, options }) => { request.cookies.set(name, value); response.cookies.set(name, value, options); }); } } });
   const { data: { user } } = await supabase.auth.getUser();
-  if (!user && request.nextUrl.pathname.startsWith("/app")) return NextResponse.redirect(new URL("/login", request.url));
+  // Make the deployed homepage the auth entry point. Once the callback has
+  // stored a Supabase session cookie, the same URL loads the dashboard.
+  if (!user && request.nextUrl.pathname === "/") return NextResponse.redirect(new URL("/login", request.url));
   return response;
 }
 
-export const config = { matcher: ["/app/:path*"] };
+export const config = { matcher: ["/"] };
