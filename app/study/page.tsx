@@ -1,7 +1,8 @@
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
-import { ArrowLeft, BookOpen, Check, Clock3, Plus, RotateCcw, Trash2 } from "lucide-react";
+import { ArrowLeft, BookOpen, Check, Clock3, Plus, RotateCcw } from "lucide-react";
+import "./study.css";
 
 type Topic = { id: number; name: string; subject: string; progress: number };
 type Session = { id: number; topic: string; minutes: number; date: string };
