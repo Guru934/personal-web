@@ -10,8 +10,8 @@ export async function proxy(request: NextRequest) {
   const { data: { user } } = await supabase.auth.getUser();
   // Make the deployed homepage the auth entry point. Once the callback has
   // stored a Supabase session cookie, the same URL loads the dashboard.
-  if (!user && request.nextUrl.pathname === "/") return NextResponse.redirect(new URL("/login", request.url));
+  if (!user) return NextResponse.redirect(new URL("/login", request.url));
   return response;
 }
 
-export const config = { matcher: ["/"] };
+export const config = { matcher: ["/", "/analytics", "/backup", "/daily-review", "/exam", "/flashcards", "/formulas", "/goals", "/habits", "/media", "/recall", "/resources", "/settings", "/study", "/subjects", "/timetable", "/auth/update-password"] };
