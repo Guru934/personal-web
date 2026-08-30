@@ -1,0 +1,108 @@
+.pwa-prompt {
+  position: fixed;
+  bottom: 100px;
+  left: 20px;
+  right: 20px;
+  max-width: 400px;
+  background: white;
+  border: 1px solid #e5e5e1;
+  border-radius: 12px;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
+  z-index: 99;
+  animation: slideUp 0.3s ease-out;
+}
+
+@keyframes slideUp {
+  from {
+    transform: translateY(20px);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+.pwa-content {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 14px 14px 14px 16px;
+}
+
+.pwa-content > svg {
+  flex: none;
+  color: #202125;
+}
+
+.pwa-content > div {
+  flex: 1;
+  min-width: 0;
+}
+
+.pwa-content h3 {
+  margin: 0;
+  font-size: 13px;
+  font-weight: 600;
+  color: #202125;
+}
+
+.pwa-content p {
+  margin: 2px 0 0;
+  font-size: 11px;
+  color: #777d87;
+}
+
+.pwa-install {
+  flex: none;
+  background: #202125;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  padding: 6px 12px;
+  font-size: 11px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: 0.2s;
+}
+
+.pwa-install:hover {
+  background: #34363c;
+}
+
+.pwa-close {
+  flex: none;
+  background: transparent;
+  border: none;
+  color: #aeb3bc;
+  cursor: pointer;
+  padding: 4px;
+  font-size: 14px;
+  transition: 0.2s;
+}
+
+.pwa-close:hover {
+  color: #555;
+}
+
+@media (max-width: 560px) {
+  .pwa-prompt {
+    bottom: 90px;
+    left: 12px;
+    right: 12px;
+  }
+
+  .pwa-content {
+    gap: 10px;
+    padding: 12px;
+  }
+
+  .pwa-content > svg {
+    display: none;
+  }
+
+  .pwa-install {
+    padding: 5px 10px;
+    font-size: 10px;
+  }
+}
