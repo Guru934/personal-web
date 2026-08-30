@@ -4,6 +4,7 @@ import "./globals.css";
 import AuthStatus from "./auth-status";
 import PWASetup from "./components/PWASetup";
 import AssistantWidget from "./components/AssistantWidget";
+import NavMenu from "./components/NavMenu";
 
 export const metadata: Metadata = {
   title: "Personal OS",
@@ -31,6 +32,7 @@ export default function RootLayout({ children }: Readonly<{ children: ReactNode 
       </head>
       <body>
         <PWASetup />
+        <NavMenu />
         <nav className="global-tools">
           <span>Personal OS</span>
           <a href="/">Dashboard</a>

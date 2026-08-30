@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useRef, useEffect } from "react";
-import { Send, X, Minimize2, Maximize2 } from "lucide-react";
+import { Send, X, Minimize2, Maximize2, Loader } from "lucide-react";
 import "./assistant.css";
 
 export default function AssistantWidget() {
@@ -11,17 +11,19 @@ export default function AssistantWidget() {
   const [input, setInput] = useState("");
   const [loading, setLoading] = useState(false);
   const [creditsLeft, setCreditsLeft] = useState(15);
+  const [error, setError] = useState("");
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
-  }, [messages]);
+  }, [messages, loading]);
 
   const sendMessage = async () => {
     if (!input.trim() || loading || creditsLeft <= 0) return;
 
     const userMessage = input.trim();
     setInput("");
+    setError("");
     setMessages((prev) => [...prev, { role: "user", content: userMessage }]);
     setLoading(true);
 
@@ -38,15 +40,19 @@ export default function AssistantWidget() {
         setMessages((prev) => [...prev, { role: "assistant", content: data.reply }]);
         setCreditsLeft((prev) => Math.max(0, prev - 1));
       } else {
+        const errorMsg = data.error || `Error: ${response.status}`;
+        setError(errorMsg);
         setMessages((prev) => [
           ...prev,
-          { role: "assistant", content: data.error || "Failed to get response. Try again later." },
+          { role: "assistant", content: `⚠️ ${errorMsg}` },
         ]);
       }
-    } catch (error) {
+    } catch (error: any) {
+      const errorMsg = error?.message || "Network error. Check your connection.";
+      setError(errorMsg);
       setMessages((prev) => [
         ...prev,
-        { role: "assistant", content: "Network error. Check your connection." },
+        { role: "assistant", content: `⚠️ ${errorMsg}` },
       ]);
     } finally {
       setLoading(false);
@@ -64,7 +70,7 @@ export default function AssistantWidget() {
       {open && (
         <div className={`assistant-widget ${minimized ? "minimized" : ""}`}>
           <div className="assistant-header">
-            <h3>AI Assistant</h3>
+            <h3>Study Assistant</h3>
             <div className="assistant-controls">
               <button onClick={() => setMinimized(!minimized)} title={minimized ? "Maximize" : "Minimize"}>
                 {minimized ? <Maximize2 size={16} /> : <Minimize2 size={16} />}
@@ -80,7 +86,8 @@ export default function AssistantWidget() {
               <div className="assistant-messages">
                 {messages.length === 0 && (
                   <div className="assistant-empty">
-                    <p>Ask me anything about your studies, tasks, or learning goals.</p>
+                    <p>💡 Ask me anything about your studies, tasks, or learning goals.</p>
+                    <small>15 questions per day • Free with Google Gemini</small>
                   </div>
                 )}
                 {messages.map((msg, i) => (
@@ -90,21 +97,24 @@ export default function AssistantWidget() {
                 ))}
                 {loading && (
                   <div className="assistant-message assistant">
-                    <p>Thinking...</p>
+                    <p><Loader size={14} className="spin" /> Thinking...</p>
                   </div>
                 )}
                 <div ref={messagesEndRef} />
               </div>
 
               <div className="assistant-footer">
-                <small>
-                  Credits: <b>{creditsLeft}</b>/15 today
-                </small>
+                <div className="assistant-stats">
+                  <small>
+                    Credits: <b>{creditsLeft}</b>/15 today
+                  </small>
+                  {error && <small className="error">⚠️ {error}</small>}
+                </div>
                 <div className="assistant-input">
                   <input
                     value={input}
                     onChange={(e) => setInput(e.target.value)}
-                    onKeyDown={(e) => e.key === "Enter" && sendMessage()}
+                    onKeyDown={(e) => e.key === "Enter" && !e.shiftKey && sendMessage()}
                     placeholder="Ask a question..."
                     disabled={loading || creditsLeft <= 0}
                   />
