@@ -1,4 +1,4 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import type { ReactNode } from "react";
 import "./globals.css";
 import AuthStatus from "./auth-status";
@@ -9,12 +9,17 @@ export const metadata: Metadata = {
   title: "Personal OS",
   description: "A personal learning and productivity system.",
   manifest: "/manifest.json",
-  themeColor: "#202125",
-  viewport: "width=device-width, initial-scale=1, maximum-scale=5",
   appleWebApp: {
     capable: true,
     statusBarStyle: "black-translucent",
   },
+};
+
+export const viewport: Viewport = {
+  width: "device-width",
+  initialScale: 1,
+  maximumScale: 5,
+  themeColor: "#202125",
 };
 
 export default function RootLayout({ children }: Readonly<{ children: ReactNode }>) {
