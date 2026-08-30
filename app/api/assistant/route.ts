@@ -1,8 +1,8 @@
 import { createSupabaseServerClient } from "@/lib/supabase-server";
 import { NextRequest, NextResponse } from "next/server";
 
-const GEMINI_API_KEY = process.env.GOOGLE_GEMINI_API_KEY;
-const GEMINI_MODEL = process.env.GOOGLE_GEMINI_MODEL || "gemini-2.0-flash";
+const GEMINI_API_KEY = process.env.GOOGLE_GEMINI_API_KEY || "";
+const GEMINI_MODEL = process.env.GOOGLE_GEMINI_MODEL || "gemini-flash-latest";
 const DAILY_CREDIT_LIMIT = 15;
 
 export async function POST(request: NextRequest) {
@@ -14,8 +14,15 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: "Message is required" }, { status: 400 });
     }
 
+    console.log("API Key present:", !!GEMINI_API_KEY);
+    console.log("Model:", GEMINI_MODEL);
+
     if (!GEMINI_API_KEY) {
-      return NextResponse.json({ error: "API key not configured" }, { status: 500 });
+      console.error("GOOGLE_GEMINI_API_KEY is not set");
+      return NextResponse.json(
+        { error: "API key not configured. Check Vercel environment variables." },
+        { status: 500 }
+      );
     }
 
     // Verify user is authenticated
@@ -46,33 +53,36 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Call Gemini API
-    const geminiResponse = await fetch(
-      `https://generativelanguage.googleapis.com/v1beta/models/${GEMINI_MODEL}:generateContent?key=${GEMINI_API_KEY}`,
-      {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          contents: [
-            {
-              parts: [
-                {
-                  text: `You are a helpful study assistant for a Personal OS learning system. Help the user with their learning, productivity, and study-related questions. Keep responses concise and actionable. User question: ${message}`,
-                },
-              ],
-            },
-          ],
-        }),
-      }
-    );
+    // Call Gemini API with correct format
+    const url = `https://generativelanguage.googleapis.com/v1beta/models/${GEMINI_MODEL}:generateContent?key=${GEMINI_API_KEY}`;
+
+    console.log("Calling Gemini at:", url.substring(0, 80) + "...");
+
+    const geminiResponse = await fetch(url, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        contents: [
+          {
+            parts: [
+              {
+                text: `You are a helpful study assistant for a Personal OS learning system. Help the user with their learning, productivity, and study-related questions. Keep responses concise and actionable. User question: ${message}`,
+              },
+            ],
+          },
+        ],
+      }),
+    });
+
+    console.log("Gemini response status:", geminiResponse.status);
 
     if (!geminiResponse.ok) {
       const error = await geminiResponse.text();
       console.error("Gemini API error:", error);
       return NextResponse.json(
-        { error: "Failed to get response from AI" },
+        { error: `Gemini API error: ${geminiResponse.status}` },
         { status: 500 }
       );
     }
@@ -98,10 +108,10 @@ export async function POST(request: NextRequest) {
     }
 
     return NextResponse.json({ reply });
-  } catch (error) {
+  } catch (error: any) {
     console.error("Assistant API error:", error);
     return NextResponse.json(
-      { error: "Internal server error" },
+      { error: `Internal error: ${error?.message}` },
       { status: 500 }
     );
   }
