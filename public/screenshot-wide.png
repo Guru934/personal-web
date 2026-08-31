@@ -1,0 +1,13 @@
+<svg width="1280" height="720" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="bg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#f7f7f5;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#fafaf8;stop-opacity:1" />
+    </linearGradient>
+  </defs>
+  <rect width="1280" height="720" fill="url(#bg)"/>
+  <rect width="1280" height="60" fill="#202125"/>
+  <text x="640" y="35" font-size="24" font-weight="bold" fill="white" text-anchor="middle" dominant-baseline="central" font-family="Arial, sans-serif">Personal OS</text>
+  <rect x="20" y="80" width="1240" height="620" rx="14" fill="white" stroke="#e5e5e1" stroke-width="1"/>
+  <text x="640" y="360" font-size="18" fill="#6366f1" text-anchor="middle" dominant-baseline="central" font-family="Arial, sans-serif">✨ AI-Powered Learning</text>
+</svg>

@@ -2,8 +2,108 @@
 
 import { useEffect, useState } from "react";
 import { ArrowLeft, ExternalLink, Plus, Trash2 } from "lucide-react";
+import { useSupabaseSync } from "@/lib/useSupabaseSync";
+import { createSupabaseBrowserClient } from "@/lib/supabase-browser";
 import "./media.css";
-import "./hubs.css";
-type Media={id:number;title:string;type:"Movie"|"Anime"|"Manga"|"Game";status:"Want"|"In Progress"|"Completed"|"Dropped"};
-const hubs=[{title:"Anime & Manga",links:[{label:"Anime Tracker / Stream",url:"https://www.miruro.ru/"},{label:"Manga Reader",url:"https://comix.to/home"}]},{title:"Movies & Music",links:[{label:"Movies",url:"https://www.rivestream.app/"},{label:"Music",url:"https://monochrome.tf/"}]},{title:"Gaming",links:[{label:"Game Launchers",url:"https://www.crazygames.com/"}]}];
-export default function MediaPage(){const[items,setItems]=useState<Media[]>([]),[title,setTitle]=useState(""),[type,setType]=useState<Media["type"]>("Movie"),[ready,setReady]=useState(false);useEffect(()=>{try{const s=localStorage.getItem("pos.media");if(s)setItems(JSON.parse(s))}finally{setReady(true)}},[]);useEffect(()=>{if(ready)localStorage.setItem("pos.media",JSON.stringify(items))},[items,ready]);const add=()=>{if(title.trim()){setItems(x=>[{id:Date.now(),title:title.trim(),type,status:"Want"},...x]);setTitle("")}};return <main className="media"><a href="/" className="back"><ArrowLeft size={16}/> Personal OS</a><p>MEDIA</p><h1>Entertainment hub</h1><span>Launch media services and keep your personal list in one place.</span><div className="hub-grid">{hubs.map(hub=><section className="hub" key={hub.title}><h2>{hub.title}</h2>{hub.links.map(link=><a key={link.url} href={link.url} target="_blank" rel="noreferrer">{link.label}<ExternalLink size={14}/></a>)}</section>)}</div><section className="add"><input value={title} onChange={e=>setTitle(e.target.value)} onKeyDown={e=>e.key==="Enter"&&add()} placeholder="Add a title to your list..."/><select value={type} onChange={e=>setType(e.target.value as Media["type"])}><option>Movie</option><option>Anime</option><option>Manga</option><option>Game</option></select><button onClick={add}><Plus size={16}/> Add</button></section><section className="list">{items.length?items.map(item=><article key={item.id}><div><small>{item.type}</small><h2>{item.title}</h2></div><select value={item.status} onChange={e=>setItems(x=>x.map(i=>i.id===item.id?{...i,status:e.target.value as Media["status"]}:i))}><option>Want</option><option>In Progress</option><option>Completed</option><option>Dropped</option></select><button className="delete" onClick={()=>setItems(x=>x.filter(i=>i.id!==item.id))}><Trash2 size={15}/></button></article>):<p className="empty">Your personal list is empty.</p>}</section><p className="notice">Only use services and content you are legally permitted to access.</p></main>}
+
+type MediaItem = { id: number; title: string; url: string; type: string };
+
+const seed: MediaItem[] = [
+  { id: 1, title: "freeCodeCamp - Web Dev", url: "https://freecodecamp.org", type: "Course" },
+];
+
+export default function MediaPage() {
+  const [userId, setUserId] = useState<string | undefined>();
+  const { data: media, updateData: setMedia, syncState } = useSupabaseSync<MediaItem[]>(
+    "media",
+    "pos.media",
+    seed,
+    userId
+  );
+
+  const [title, setTitle] = useState("");
+  const [url, setUrl] = useState("");
+  const [type, setType] = useState("Course");
+
+  useEffect(() => {
+    const getUser = async () => {
+      const client = createSupabaseBrowserClient();
+      if (client) {
+        const { data: { user } } = await client.auth.getUser();
+        if (user) setUserId(user.id);
+      }
+    };
+    getUser();
+  }, []);
+
+  const add = () => {
+    if (title.trim() && url.trim()) {
+      setMedia((x) => [
+        ...x,
+        { id: Date.now(), title: title.trim(), url, type },
+      ]);
+      setTitle("");
+      setUrl("");
+    }
+  };
+
+  return (
+    <main className="media-page">
+      <a href="/" className="back">
+        <ArrowLeft size={16} /> Personal OS
+      </a>
+      <p>RESOURCES</p>
+      <h1>Media Hub</h1>
+      <span>Organize courses, videos, articles, and learning materials.</span>
+      <small style={{ color: syncState === "synced" ? "#3d8c61" : "#999" }}>
+        {syncState === "synced" ? "☁️ Cloud synced" : "💾 Local mode"}
+      </small>
+
+      <section className="add-media">
+        <input
+          value={title}
+          onChange={(e) => setTitle(e.target.value)}
+          placeholder="Title"
+        />
+        <input
+          value={url}
+          onChange={(e) => setUrl(e.target.value)}
+          placeholder="https://..."
+        />
+        <select value={type} onChange={(e) => setType(e.target.value)}>
+          <option>Course</option>
+          <option>Video</option>
+          <option>Article</option>
+          <option>Book</option>
+          <option>Podcast</option>
+          <option>Other</option>
+        </select>
+        <button onClick={add}>
+          <Plus size={16} /> Add
+        </button>
+      </section>
+
+      <div className="media-grid">
+        {media.map((item) => (
+          <article key={item.id} className="media-card">
+            <div className="media-header">
+              <h3>{item.title}</h3>
+              <button
+                onClick={() =>
+                  setMedia((x) => x.filter((i) => i.id !== item.id))
+                }
+              >
+                <Trash2 size={14} />
+              </button>
+            </div>
+            <small>{item.type}</small>
+            <p>{item.url}</p>
+            <a href={item.url} target="_blank" rel="noreferrer">
+              <ExternalLink size={14} /> Open
+            </a>
+          </article>
+        ))}
+      </div>
+    </main>
+  );
+}
