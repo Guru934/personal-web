@@ -2,6 +2,7 @@
 
 import { useState, useRef, useEffect } from "react";
 import { Send, X, Minimize2, Maximize2, Loader } from "lucide-react";
+import { createSupabaseBrowserClient } from "@/lib/supabase-browser";
 import "./assistant.css";
 
 export default function AssistantWidget() {
@@ -11,6 +12,30 @@ export default function AssistantWidget() {
   const [input, setInput] = useState("");
   const [loading, setLoading] = useState(false);
   const [creditsLeft, setCreditsLeft] = useState(15);
+
+  // Load credits from Supabase on mount
+  useEffect(() => {
+    const loadCredits = async () => {
+      const client = createSupabaseBrowserClient();
+      if (!client) return;
+
+      const { data: { user } } = await client.auth.getUser();
+      if (!user) return;
+
+      const today = new Date().toISOString().split("T")[0];
+      const { data: usage } = await client
+        .from("ai_usage")
+        .select("credits_used")
+        .eq("user_id", user.id)
+        .eq("date", today)
+        .single();
+
+      const creditsUsed = usage?.credits_used || 0;
+      setCreditsLeft(Math.max(0, 15 - creditsUsed));
+    };
+
+    loadCredits();
+  }, [open]);
   const [error, setError] = useState("");
   const messagesEndRef = useRef<HTMLDivElement>(null);
 

@@ -97,11 +97,18 @@ export function useSupabaseSync<T extends any[]>(
     if (userId && syncState === "synced" && Array.isArray(updated)) {
       const client = createSupabaseBrowserClient();
       if (client) {
-        const items = (updated as any[]).map((item) => ({
-          ...item,
-          user_id: userId,
-          updated_at: new Date().toISOString(),
-        }));
+        const items = (updated as any[]).map((item: any) => {
+          // Don't send client-generated IDs for 'identity' columns
+          // Server will auto-generate these. Only include id if it's from server.
+          const { id, ...rest } = item;
+          const isServerId = typeof id === 'string' || (typeof id === 'number' && id < 0);
+          return {
+            ...rest,
+            user_id: userId,
+            updated_at: new Date().toISOString(),
+            ...(isServerId ? { id } : {}),
+          };
+        });
 
         void (async () => {
           try {
