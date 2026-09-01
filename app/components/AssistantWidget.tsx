@@ -8,7 +8,17 @@ import "./assistant.css";
 export default function AssistantWidget() {
   const [open, setOpen] = useState(false);
   const [minimized, setMinimized] = useState(false);
-  const [messages, setMessages] = useState<Array<{ role: "user" | "assistant"; content: string }>>([]);
+  const [messages, setMessages] = useState<Array<{ role: "user" | "assistant"; content: string }>>(() => {
+    if (typeof window !== 'undefined') {
+      const saved = sessionStorage.getItem('assistant_messages');
+      if (saved) return JSON.parse(saved);
+    }
+    return [];
+  });
+
+  useEffect(() => {
+    sessionStorage.setItem('assistant_messages', JSON.stringify(messages));
+  }, [messages]);
   const [input, setInput] = useState("");
   const [loading, setLoading] = useState(false);
   const [creditsLeft, setCreditsLeft] = useState(15);
@@ -56,7 +66,10 @@ export default function AssistantWidget() {
       const response = await fetch("/api/assistant", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ message: userMessage }),
+        body: JSON.stringify({
+          message: userMessage,
+          history: messages.slice(-20),
+        }),
       });
 
       const data = await response.json();

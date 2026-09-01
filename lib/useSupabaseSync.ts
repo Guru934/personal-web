@@ -101,7 +101,7 @@ export function useSupabaseSync<T extends any[]>(
           // Don't send client-generated IDs for 'identity' columns
           // Server will auto-generate these. Only include id if it's from server.
           const { id, ...rest } = item;
-          const isServerId = typeof id === 'string' || (typeof id === 'number' && id < 0);
+          const isServerId = typeof id === 'string' || (typeof id === 'number' && id < 1_000_000_000_000);
           return {
             ...rest,
             user_id: userId,

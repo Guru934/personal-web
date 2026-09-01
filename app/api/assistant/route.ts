@@ -8,7 +8,7 @@ const DAILY_CREDIT_LIMIT = 15;
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json();
-    const { message } = body;
+    const { message, history } = body;
 
     if (!message || typeof message !== "string" || !message.trim()) {
       return NextResponse.json({ error: "Message is required" }, { status: 400 });
@@ -58,23 +58,52 @@ export async function POST(request: NextRequest) {
 
     console.log("Calling Gemini at:", url.substring(0, 80) + "...");
 
-    const geminiResponse = await fetch(url, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        contents: [
-          {
-            parts: [
-              {
-                text: `You are a helpful study assistant for a Personal OS learning system. Help the user with their learning, productivity, and study-related questions. Keep responses concise and actionable. User question: ${message}`,
-              },
-            ],
-          },
-        ],
-      }),
+    const systemInstruction = "You are a helpful study assistant for a Personal OS learning system. Help the user with their learning, productivity, and study-related questions. Keep responses concise and actionable.";
+
+    const contents: Array<{ role: string; parts: Array<{ text: string }> }> = [];
+
+    if (Array.isArray(history)) {
+      for (const turn of history) {
+        if (turn?.role && typeof turn.content === "string" && (turn.role === "user" || turn.role === "assistant" || turn.role === "model")) {
+          contents.push({
+            role: turn.role === "assistant" ? "model" : "user",
+            parts: [{ text: turn.content }],
+          });
+        }
+      }
+    }
+
+    contents.push({
+      role: "user",
+      parts: [{ text: message }],
     });
+
+    
+    let geminiResponse;
+    let retries = 2;
+    while (retries >= 0) {
+      geminiResponse = await fetch(url, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          system_instruction: {
+            parts: [{ text: systemInstruction }],
+          },
+          contents,
+        }),
+      });
+      
+      if (geminiResponse.status === 503 && retries > 0) {
+        console.log("Gemini returned 503, retrying in 1s...");
+        await new Promise(r => setTimeout(r, 1000));
+        retries--;
+        continue;
+      }
+      break;
+    }
+
 
     console.log("Gemini response status:", geminiResponse.status);
 
