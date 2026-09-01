@@ -51,21 +51,21 @@
       "name": "Study",
       "short_name": "Study",
       "description": "Start a study session",
-      "url": "/study",
+      "url": "/",
       "icons": [{ "src": "/icon-96x96.png", "sizes": "96x96", "type": "image/png" }]
     },
     {
       "name": "Tasks",
       "short_name": "Tasks",
       "description": "View your tasks",
-      "url": "/tasks",
+      "url": "/",
       "icons": [{ "src": "/icon-96x96.png", "sizes": "96x96", "type": "image/png" }]
     },
     {
       "name": "Goals",
       "short_name": "Goals",
       "description": "Check your goals",
-      "url": "/goals",
+      "url": "/",
       "icons": [{ "src": "/icon-96x96.png", "sizes": "96x96", "type": "image/png" }]
     }
   ]

@@ -4,8 +4,8 @@
   left: 20px;
   right: 20px;
   max-width: 400px;
-  background: white;
-  border: 1px solid #e5e5e1;
+  background: var(--bg-secondary);
+  border: 1px solid var(--border-color);
   border-radius: 12px;
   box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
   z-index: 99;
@@ -32,7 +32,7 @@
 
 .pwa-content > svg {
   flex: none;
-  color: #202125;
+  color: var(--text-primary);
 }
 
 .pwa-content > div {
@@ -44,13 +44,13 @@
   margin: 0;
   font-size: 13px;
   font-weight: 600;
-  color: #202125;
+  color: var(--text-primary);
 }
 
 .pwa-content p {
   margin: 2px 0 0;
   font-size: 11px;
-  color: #777d87;
+  color: var(--text-secondary);
 }
 
 .pwa-install {
@@ -74,7 +74,7 @@
   flex: none;
   background: transparent;
   border: none;
-  color: #aeb3bc;
+  color: var(--text-secondary);
   cursor: pointer;
   padding: 4px;
   font-size: 14px;
@@ -82,7 +82,7 @@
 }
 
 .pwa-close:hover {
-  color: #555;
+  color: var(--text-secondary);
 }
 
 @media (max-width: 560px) {
