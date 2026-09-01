@@ -9,3 +9,31 @@ button:focus-visible,input:focus-visible,a:focus-visible,select:focus-visible,te
 .auth-status{display:inline-flex;align-items:center;gap:8px;flex:none}.auth-status small{max-width:150px;overflow:hidden;text-overflow:ellipsis;color: var(--text-secondary)}.auth-status button{border:1px solid #555861;background:transparent;color:#dfe2e7;border-radius:6px;padding:3px 7px;font-size:10px}
 .sidebar-backdrop{display:none}@media(max-width:850px){.sidebar-backdrop{display:block;position:fixed;inset:0;background:rgba(0,0,0,.35);z-index:2}}
 .sync-status{font-size:11px;white-space:nowrap}.sync-status.synced{color: var(--text-primary)}.sync-status.error{color:#b14d4d}.sync-status.loading{color: var(--text-secondary)}.sync-status.local{color: var(--text-secondary)}
+
+@media(max-width: 700px) {
+  header { display: none !important; }
+}
+
+@media(max-width: 700px) {
+  main[class*="-page"] {
+    padding-top: 60px !important;
+  }
+  .back {
+    padding: 12px 12px 12px 0 !important;
+  }
+}
+
+/* Fix heading visibility and color highlighting */
+h1, h2, h3, h4, h5, h6 {
+  color: var(--text-primary) !important;
+}
+.head h1 {
+  color: var(--color-indigo) !important; /* highlight main headings */
+}
+.card h2 {
+  color: var(--text-primary) !important;
+  font-weight: 700;
+}
+strong, b {
+  color: var(--text-primary);
+}

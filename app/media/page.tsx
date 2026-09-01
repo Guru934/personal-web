@@ -59,7 +59,17 @@ export default function MediaPage() {
         {syncState === "synced" ? "☁️ Cloud synced" : "💾 Local mode"}
       </small>
 
+      
+      <section className="hubs-grid">
+        <a href="https://www.miruro.ru/" target="_blank" rel="noreferrer" className="hub-link">Anime</a>
+        <a href="https://comix.to/home" target="_blank" rel="noreferrer" className="hub-link">Manga</a>
+        <a href="https://www.rivestream.app/" target="_blank" rel="noreferrer" className="hub-link">Movies</a>
+        <a href="https://monochrome.tf/" target="_blank" rel="noreferrer" className="hub-link">Music</a>
+        <a href="https://www.crazygames.com/" target="_blank" rel="noreferrer" className="hub-link">Games</a>
+      </section>
+
       <section className="add-media">
+
         <input
           value={title}
           onChange={(e) => setTitle(e.target.value)}

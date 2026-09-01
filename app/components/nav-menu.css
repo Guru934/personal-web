@@ -176,3 +176,10 @@
   scrollbar-width: thin;
   scrollbar-color: #d0d0cc transparent;
 }
+
+.nav-link.active {
+  background: var(--bg-primary);
+  color: var(--color-indigo);
+  border-left-color: var(--color-indigo);
+  font-weight: 700;
+}

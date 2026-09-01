@@ -1,7 +1,7 @@
 "use client";
-
 import { useState } from "react";
 import { Menu, X } from "lucide-react";
+import { usePathname } from "next/navigation";
 import "./nav-menu.css";
 
 const navLinks = [
@@ -22,17 +22,11 @@ const navLinks = [
   { label: "Backup", href: "/backup" },
 ];
 
-
-const mediaLinks = [
-  { label: "Anime (Media)", href: "https://www.miruro.ru/" },
-  { label: "Manga (Media)", href: "https://comix.to/home" },
-  { label: "Movies (Media)", href: "https://www.rivestream.app/" },
-  { label: "Music (Media)", href: "https://monochrome.tf/" },
-  { label: "Games (Media)", href: "https://www.crazygames.com/" }
-];
-
 export default function NavMenu() {
   const [open, setOpen] = useState(false);
+  const pathname = usePathname();
+  
+  if (pathname === '/login') return null;
 
   return (
     <>
@@ -44,43 +38,26 @@ export default function NavMenu() {
 
       <nav className={`nav-menu ${open ? "open" : ""}`}>
         <div className="nav-header">
-          <h3>Navigation</h3>
+          <h3>Personal OS</h3>
           <button className="nav-close" onClick={() => setOpen(false)}>
             <X size={20} />
           </button>
         </div>
 
         <div className="nav-links">
-          {navLinks.map((link) => (
-            <a
-              key={link.href}
-              href={link.href}
-              className="nav-link"
-              onClick={() => setOpen(false)}
-            >
-              {link.label}
-            </a>
-          ))}
-
-        </div>
-        
-        <div className="nav-header" style={{ marginTop: '16px', borderTop: '1px solid var(--border-color)', paddingTop: '16px' }}>
-          <h3>Media Hub</h3>
-        </div>
-        
-        <div className="nav-links">
-          {mediaLinks.map((link) => (
-            <a
-              key={link.href}
-              href={link.href}
-              className="nav-link"
-              onClick={() => setOpen(false)}
-              target="_blank"
-              rel="noreferrer"
-            >
-              {link.label}
-            </a>
-          ))}
+          {navLinks.map((link) => {
+            const isActive = pathname === link.href;
+            return (
+              <a
+                key={link.href}
+                href={link.href}
+                className={`nav-link ${isActive ? "active" : ""}`}
+                onClick={() => setOpen(false)}
+              >
+                {link.label}
+              </a>
+            );
+          })}
         </div>
       </nav>
     </>
